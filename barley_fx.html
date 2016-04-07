@@ -1,0 +1,587 @@
+<!-- Barley -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+	body {
+	  font-family: arial;
+  	  font-size: 12px;
+	 }
+
+	svg {
+	    /*border: 1px solid #f0f;*/
+	 }
+
+	.g-all-charts-container {
+		margin: 10px 0;
+	 }
+
+	.g-container {
+		margin: 10px 0;
+		display: inline-block;
+	 }
+
+	.g-siteName {
+  	 	text-align: center;
+  	 	font-size: 14px;
+	 } 
+
+	.g-location {
+    text-align: center;
+    font-size: 14px;
+    } 
+
+	.axis path,
+	.axis line {
+	    fill: none;
+	    stroke: black;
+	    stroke-width: 1px;
+	 }
+
+	.axis text {
+	    font-family: arial, sans-serif;
+	    font-size: 12px;
+	    pointer-events: none;
+	    fill: black;
+	}
+	  
+	.slope-line {
+	  	stroke: black;
+	  	stroke-width: 2;
+	 }
+
+	.text-labels {
+  		font-size: 12px;
+  		fill: black;
+	 }
+
+	.negative {
+        stroke: grey;
+   }
+        
+  .positive {
+          stroke: #4CBB17;
+   }
+
+  .legend rect {
+      padding: 5px;
+      font: 12px;
+		  fill:none;
+		  stroke:black;
+		  opacity:0.8;
+	 }
+</style>
+
+<body>
+
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+
+//Margin Convention
+var margin = {top: 20, right: 40, bottom: 20, left: 60};
+//Then define width and height as the inner dimensions of the chart area.
+
+var width = 400 - margin.left - margin.right;
+var height = 300 - margin.top - margin.bottom;
+//Lastly, define svg as a G element that translates the origin to the top-left corner of the chart area. (BELOW, UNDER DATA)
+  
+//Hardcoded barley data. Sorry not sorry, it's an example.
+var barley_info = [
+
+{
+    "variety": "Manchuria",
+    "yield1931": 27,
+    "yield1932": 26.9,
+    "site": "University Farm"
+  },
+  {
+    "variety": "Manchuria",
+    "yield1931": 48.86667,
+    "yield1932": 33.46667,
+    "site": "Waseca"
+  },
+  {
+    "variety": "Manchuria",
+    "yield1931": 27.43334,
+    "yield1932": 34.36666,
+    "site": "Morris"
+  },
+  {
+    "variety": "Manchuria",
+    "yield1931": 39.93333,
+    "yield1932": 32.96667,
+    "site": "Crookston"
+  },
+  {
+    "variety": "Manchuria",
+    "yield1931": 32.96667,
+    "yield1932": 22.13333,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "Manchuria",
+    "yield1931": 28.96667,
+    "yield1932": 22.56667,
+    "site": "Duluth"
+  },
+  {
+    "variety": "Glabron",
+    "yield1931": 43.06666,
+    "yield1932": 36.8,
+    "site": "University Farm"
+  },
+  {
+    "variety": "Glabron",
+    "yield1931": 55.2,
+    "yield1932": 37.73333,
+    "site": "Waseca"
+  },
+  {
+    "variety": "Glabron",
+    "yield1931": 28.76667,
+    "yield1932": 35.13333,
+    "site": "Morris"
+  },
+  {
+    "variety": "Glabron",
+    "yield1931": 38.13333,
+    "yield1932": 26.16667,
+    "site": "Crookston"
+  },
+  {
+    "variety": "Glabron",
+    "yield1931": 29.13333,
+    "yield1932": 14.43333,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "Glabron",
+    "yield1931": 29.66667,
+    "yield1932": 25.86667,
+    "site": "Duluth"
+  },
+  {
+    "variety": "Svansota",
+    "yield1931": 35.13333,
+    "yield1932": 27.43334,
+    "site": "University Farm"
+  },
+  {
+    "variety": "Svansota",
+    "yield1931": 47.33333,
+    "yield1932": 38.5,
+    "site": "Waseca"
+  },
+  {
+    "variety": "Svansota",
+    "yield1931": 25.76667,
+    "yield1932": 35.03333,
+    "site": "Morris"
+  },
+  {
+    "variety": "Svansota",
+    "yield1931": 40.46667,
+    "yield1932": 20.63333,
+    "site": "Crookston"
+  },
+  {
+    "variety": "Svansota",
+    "yield1931": 29.66667,
+    "yield1932": 16.63333,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "Svansota",
+    "yield1931": 25.7,
+    "yield1932": 22.23333,
+    "site": "Duluth"
+  },
+  {
+    "variety": "Velvet",
+    "yield1931": 39.9,
+    "yield1932": 26.8,
+    "site": "University Farm"
+  },
+  {
+    "variety": "Velvet",
+    "yield1931": 50.23333,
+    "yield1932": 37.4,
+    "site": "Waseca"
+  },
+  {
+    "variety": "Velvet",
+    "yield1931": 26.13333,
+    "yield1932": 38.83333,
+    "site": "Morris"
+  },
+  {
+    "variety": "Velvet",
+    "yield1931": 41.33333,
+    "yield1932": 32.06666,
+    "site": "Crookston"
+  },
+  {
+    "variety": "Velvet",
+    "yield1931": 23.03333,
+    "yield1932": 32.23333,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "Velvet",
+    "yield1931": 26.3,
+    "yield1932": 22.46667,
+    "site": "Duluth"
+  },
+  {
+    "variety": "Trebi",
+    "yield1931": 36.56666,
+    "yield1932": 29.06667,
+    "site": "University Farm"
+  },
+  {
+    "variety": "Trebi",
+    "yield1931": 63.8333,
+    "yield1932": 49.2333,
+    "site": "Waseca"
+  },
+  {
+    "variety": "Trebi",
+    "yield1931": 43.76667,
+    "yield1932": 46.63333,
+    "site": "Morris"
+  },
+  {
+    "variety": "Trebi",
+    "yield1931": 46.93333,
+    "yield1932": 41.83333,
+    "site": "Crookston"
+  },
+  {
+    "variety": "Trebi",
+    "yield1931": 29.76667,
+    "yield1932": 20.63333,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "Trebi",
+    "yield1931": 33.93333,
+    "yield1932": 30.6,
+    "site": "Duluth"
+  },
+  {
+    "variety": "No. 457",
+    "yield1931": 43.26667,
+    "yield1932": 26.43334,
+    "site": "University Farm"
+  },
+  {
+    "variety": "No. 457",
+    "yield1931": 58.1,
+    "yield1932": 42.2,
+    "site": "Waseca"
+  },
+  {
+    "variety": "No. 457",
+    "yield1931": 28.7,
+    "yield1932": 43.53334,
+    "site": "Morris"
+  },
+  {
+    "variety": "No. 457",
+    "yield1931": 45.66667,
+    "yield1932": 34.33333,
+    "site": "Crookston"
+  },
+  {
+    "variety": "No. 457",
+    "yield1931": 32.16667,
+    "yield1932": 19.46667,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "No. 457",
+    "yield1931": 33.6,
+    "yield1932": 22.7,
+    "site": "Duluth"
+  },
+  {
+    "variety": "No. 462",
+    "yield1931": 36.6,
+    "yield1932": 25.56667,
+    "site": "University Farm"
+  },
+  {
+    "variety": "No. 462",
+    "yield1931": 65.7667,
+    "yield1932": 44.7,
+    "site": "Waseca"
+  },
+  {
+    "variety": "No. 462",
+    "yield1931": 30.36667,
+    "yield1932": 47,
+    "site": "Morris"
+  },
+  {
+    "variety": "No. 462",
+    "yield1931": 48.56666,
+    "yield1932": 30.53333,
+    "site": "Crookston"
+  },
+  {
+    "variety": "No. 462",
+    "yield1931": 24.93334,
+    "yield1932": 19.9,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "No. 462",
+    "yield1931": 28.1,
+    "yield1932": 22.5,
+    "site": "Duluth"
+  },
+  {
+    "variety": "Peatland",
+    "yield1931": 32.76667,
+    "yield1932": 28.06667,
+    "site": "University Farm"
+  },
+  {
+    "variety": "Peatland",
+    "yield1931": 48.56666,
+    "yield1932": 36.03333,
+    "site": "Waseca"
+  },
+  {
+    "variety": "Peatland",
+    "yield1931": 29.86667,
+    "yield1932": 43.2,
+    "site": "Morris"
+  },
+  {
+    "variety": "Peatland",
+    "yield1931": 41.6,
+    "yield1932": 25.23333,
+    "site": "Crookston"
+  },
+  {
+    "variety": "Peatland",
+    "yield1931": 34.7,
+    "yield1932": 26.76667,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "Peatland",
+    "yield1931": 32,
+    "yield1932": 31.36667,
+    "site": "Duluth"
+  },
+  {
+    "variety": "No. 475",
+    "yield1931": 24.66667,
+    "yield1932": 30,
+    "site": "University Farm"
+  },
+  {
+    "variety": "No. 475",
+    "yield1931": 46.76667,
+    "yield1932": 41.26667,
+    "site": "Waseca"
+  },
+  {
+    "variety": "No. 475",
+    "yield1931": 22.6,
+    "yield1932": 44.23333,
+    "site": "Morris"
+  },
+  {
+    "variety": "No. 475",
+    "yield1931": 44.1,
+    "yield1932": 32.13333,
+    "site": "Crookston"
+  },
+  {
+    "variety": "No. 475",
+    "yield1931": 19.7,
+    "yield1932": 15.23333,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "No. 475",
+    "yield1931": 33.06666,
+    "yield1932": 27.36667,
+    "site": "Duluth"
+  },
+  {
+    "variety": "Wisconsin No. 38",
+    "yield1931": 39.3,
+    "yield1932": 38,
+    "site": "University Farm"
+  },
+  {
+    "variety": "Wisconsin No. 38",
+    "yield1931": 58.8,
+    "yield1932": 58.16667,
+    "site": "Waseca"
+  },
+  {
+    "variety": "Wisconsin No. 38",
+    "yield1931": 29.46667,
+    "yield1932": 47.16667,
+    "site": "Morris"
+  },
+  {
+    "variety": "Wisconsin No. 38",
+    "yield1931": 49.86667,
+    "yield1932": 35.9,
+    "site": "Crookston"
+  },
+  {
+    "variety": "Wisconsin No. 38",
+    "yield1931": 34.46667,
+    "yield1932": 20.66667,
+    "site": "Grand Rapids"
+  },
+  {
+    "variety": "Wisconsin No. 38",
+    "yield1931": 31.6,
+    "yield1932": 29.33333,
+    "site": "Duluth"
+  }
+];
+
+//Create x axis labels
+var xLabels = ["1931", "1932"];
+
+//Setting x and y variables to scale
+var x = d3.scale.ordinal()
+    .domain(xLabels)
+    .rangePoints([0, width], .5);
+
+var y = d3.scale.linear()
+     .domain([13, 70])
+     .range([height, 0]); 
+
+//Setting the x and y axes
+var xAxis = d3.svg.axis()
+	.scale(x)
+	.tickSize(8)
+	.orient("bottom");
+
+var yAxis = d3.svg.axis()
+	.scale(y)
+	.ticks(5)
+	.tickSize(10)
+	.tickPadding(10)
+	.orient("left");
+
+function makeCharts(siteName) {
+	
+	//Filter data for specific site
+	var myLocationData = barley_info.filter(function(d) {
+            return d.site === siteName;
+        });
+
+	var container = d3.select("body")
+		.append("div")
+		.attr("class", "g-container");
+
+  container.append("h3") //Add the site's name as a heading
+    .attr("class", "g-location")
+    .text(siteName);
+ 
+  //Create svg elements to join to the data
+	var svg = container.append("svg")
+  	.attr("width", width + margin.left + margin.right)
+ 		.attr("height", height + margin.top + margin.bottom)
+  	.append("g")
+  	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  //Add x axis to graph
+	svg.append("g")
+		.attr("class", "axis") //for CSS styling; ???
+		.attr("transform", "translate(0, " + height + ")") //move to bottom of the graph. Translate changes pixel count to context of the graph.
+		.call(xAxis); 
+
+	//Add numeric y axis to graph
+	svg.append("g")
+			.attr("class", "axis") //for CSS styling; ??
+			.call(yAxis)
+	//Add a y axis label
+  		.append("text")
+  			.text("Yield (Bushels per Acre)")
+  			.attr("transform", "rotate(-90)")
+  			.attr("dy", "-4em")
+  			.attr("dx", "-15em");
+
+	var lineSelector = "slope-line";
+
+	//Lines - Cleaned up http://bl.ocks.org/biovisualize/4348024
+	var barley_line_new = svg.selectAll("slope-line")
+			.data(myLocationData)
+			.enter()
+			.append("line")
+			.attr("class", "slope-line")
+			.attr("x1", x("1931"))
+			.attr("x2", x("1932"))
+			.attr("y1", function(d) {return y(d.yield1931); })
+			.attr("y2", function(d) {return y(d.yield1932); })
+			.attr("class", function(d) {
+          var diff = d.yield1932 - d.yield1931;
+          return lineSelector + ((diff > 0) ? " positive" : " negative");
+          });
+
+	//Sort variety names in order of 1932 yield, to use as labels
+	var varsSorted = myLocationData.sort(function(x, y) {
+				return x.yield1932 - y.yield1932
+		});
+
+	function sortLabels(to_sort) {
+			var sorted = [];
+			for (var x = 0, len = to_sort.length; x < len; x++) {
+				sorted.push(to_sort[x].variety);
+			 }
+			//console.log(sorted);
+			return sorted;
+		}
+
+	var varLabels = sortLabels(varsSorted);
+
+  //Add a legend.
+
+  var legendRectSize = 18;                               
+  var legendSpacing = 6;                                  
+
+  var legend = svg.selectAll(".legend")
+    .data(myLocationData)
+    .enter()
+    .append('g')
+      .attr('class', 'legend')
+      .attr('transform', function(d, i) {
+        var height = legendRectSize;
+        var x = width - 40;
+        var y = 220 - (i * 18);
+        return 'translate(' + x + ',' + y + ')';
+    });
+                                               
+legend.append('text')
+    .text( function(d) {return d.variety;})
+    .style("fill", function(d) {
+       var diff2 = d.yield1932 - d.yield1931;
+       return ((diff2 > 0) ? "#4CBB17" : "grey")
+       })
+        ;
+
+}
+
+//Get a list of unique site names
+var siteList = d3.set(barley_info.map(function(d){
+    return d.site;
+}))
+	.values();
+
+//Use list of unique site names to draw all charts
+siteList.forEach(makeCharts);
+
+</script>
+</body>
